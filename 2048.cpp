@@ -310,7 +310,10 @@ int main(int argc, char* argv[]){
     srand(time(NULL));
     int size=4;
     if(argc>1)size=stoi(argv[1]);
-    if(size>16)return 1;
+    if(size>16){
+        system("stty sane");
+        return 1;
+    }
     cout<<"size: "<<size<<endl;
 
     //initialize game
@@ -362,6 +365,12 @@ int main(int argc, char* argv[]){
         }
         input=getch();
         bool didUpdate=update(plane,input);
+        if(gameOver(plane, didUpdate)){
+            system("clear");
+            cout<<"GAME OVER!\r\n";
+            system("stty sane");
+            return 0;
+        }
         if(didUpdate){
             do{
                 randx=rand()%size;
@@ -369,15 +378,13 @@ int main(int argc, char* argv[]){
             }while(plane[randx][randy]);
             plane[randx][randy]=2;
         }
-        if(gameOver(plane, didUpdate)){
-            system("clear");
-            cout<<"GAME OVER!\r\n";
-        }
+        
         //usleep(20000);
         system("clear");
     }
 
     endwin();
-    
+    system("stty sane");
+    return 0;
 }
 
