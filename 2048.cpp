@@ -178,7 +178,8 @@ void showPlane(vector<vector<int>>&plane){
     }
 }
 
-void update(vector<vector<int>>&plane, int dir){
+bool update(vector<vector<int>>&plane, int dir){
+    bool didUpdate=false;
     switch(dir){
         case KEY_UP:{
             for(int i=1;i<plane.size();i++){
@@ -188,14 +189,17 @@ void update(vector<vector<int>>&plane, int dir){
                     for(int k=i;k>=1;k--){
                         if(plane[k-1][j]!=foo && plane[k-1][j]!=0 && plane[k][j]==0){
                             plane[k][j]=foo;
+                            didUpdate=true;
                             break;
                         }
                         else if(plane[k-1][j]==foo){
                             plane[k-1][j]*=2;
+                            didUpdate=true;
                             break;
                         }
                         else if(k==1 && plane[k-1][j]==0){
                             plane[k-1][j]=foo;
+                            didUpdate=true;
                             break;
                         }
                     }
@@ -211,14 +215,17 @@ void update(vector<vector<int>>&plane, int dir){
                     for(int k=i;k<plane.size()-1;k++){
                         if(plane[k+1][j]!=foo && plane[k+1][j]!=0 && plane[k][j]==0){
                             plane[k][j]=foo;
+                            didUpdate=true;
                             break;
                         }
                         else if(plane[k+1][j]==foo){
                             plane[k+1][j]*=2;
+                            didUpdate=true;
                             break;
                         }
                         else if(k==plane.size()-2 && plane[k+1][j]==0){
                             plane[k+1][j]=foo;
+                            didUpdate=true;
                             break;
                         }
                     }
@@ -234,14 +241,17 @@ void update(vector<vector<int>>&plane, int dir){
                     for(int k=j;k<plane.size()-1;k++){
                         if(plane[i][k+1]!=foo && plane[i][k+1]!=0 && plane[i][k]==0){
                             plane[i][k]=foo;
+                            didUpdate=true;
                             break;
                         }
                         else if(plane[i][k+1]==foo){
                             plane[i][k+1]*=2;
+                            didUpdate=true;
                             break;
                         }
                         else if(k==plane.size()-2 && plane[i][k+1]==0){
                             plane[i][k+1]=foo;
+                            didUpdate=true;
                             break;
                         }
                     }
@@ -255,17 +265,20 @@ void update(vector<vector<int>>&plane, int dir){
                 for(int j=1;j<plane.size();j++){
                     int foo=plane[i][j];
                     plane[i][j]=0;
-                    for(int k=i;k>=1;k--){
+                    for(int k=j;k>=1;k--){
                         if(plane[i][k-1]!=foo && plane[i][k-1]!=0 && plane[i][k]==0){
                             plane[i][k]=foo;
+                            didUpdate=true;
                             break;
                         }
                         else if(plane[i][k-1]==foo){
                             plane[i][k-1]*=2;
+                            didUpdate=true;
                             break;
                         }
                         else if(k==1 && plane[i][k-1]==0){
                             plane[i][k-1]=foo;
+                            didUpdate=true;
                             break;
                         }
                     }
@@ -274,6 +287,18 @@ void update(vector<vector<int>>&plane, int dir){
 
         }
     }
+    return didUpdate;
+}
+
+bool gameOver(vector<vector<int>>&plane,bool didUpdate){
+    bool isFull=true;
+    for(int i=0;i<plane.size();i++){
+        for(int j=0;j<plane.size();j++){
+            if(plane[i][j]==0)return false;
+        }
+    }
+    if(isFull && !didUpdate)return true;
+    else return false;
 }
 
 int main(int argc, char* argv[]){
@@ -336,14 +361,18 @@ int main(int argc, char* argv[]){
             }
         }
         input=getch();
-        
-        update(plane,input);
-        do{
-            randx=rand()%size;
-            randy=rand()%size;
-        }while(plane[randx][randy]);
-        plane[randx][randy]=2;
-
+        bool didUpdate=update(plane,input);
+        if(didUpdate){
+            do{
+                randx=rand()%size;
+                randy=rand()%size;
+            }while(plane[randx][randy]);
+            plane[randx][randy]=2;
+        }
+        if(gameOver(plane, didUpdate)){
+            system("clear");
+            cout<<"GAME OVER!\r\n";
+        }
         //usleep(20000);
         system("clear");
     }
